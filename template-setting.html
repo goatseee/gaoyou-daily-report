@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模板设置 - 高邮公安工作日报</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#304156;--primary-light:#409EFF;--primary-dark:#1d2b3a;--accent:#409EFF;--bg:#f0f2f5;--card:#fff;--text:#333;--text-light:#666;--border:#e4e7ed;--success:#67C23A;--warning:#E6A23C;--danger:#F56C6C;--info:#909399}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:210px;background:var(--primary);color:#fff;flex-shrink:0;display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:100}
+.sidebar-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo span{font-size:14px;font-weight:600;white-space:nowrap}
+.sidebar-menu{flex:1;overflow-y:auto;padding:8px 0}
+.menu-item{padding:0 16px;height:44px;display:flex;align-items:center;color:#bfcbd9;cursor:pointer;transition:all .2s;font-size:13px;text-decoration:none;position:relative}
+.menu-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.menu-item.active{background:var(--accent);color:#fff}
+.menu-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#fff}
+.menu-item .icon{width:18px;height:18px;margin-right:10px;text-align:center;font-style:normal}
+
+/* Main */
+.main{margin-left:210px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:0 1px 4px rgba(0,0,0,.08);position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left .breadcrumb{font-size:13px;color:var(--text-light)}
+.header-left .breadcrumb a{color:var(--accent);text-decoration:none}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-right .user{font-size:13px;color:var(--text-light);cursor:pointer}
+.content{flex:1;padding:20px}
+
+/* Page title */
+.page-title{font-size:18px;font-weight:600;color:var(--primary-dark);margin-bottom:4px}
+.page-desc{font-size:13px;color:var(--text-light);margin-bottom:20px}
+
+/* Card */
+.card{background:var(--card);border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px;overflow:hidden}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.card-header:hover{background:#fafbfc}
+.card-header h3{font-size:15px;color:var(--primary-dark);font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:0 20px 20px}
+.card-body.collapsed{display:none}
+
+/* Section icon colors */
+.sec-icon{width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#fff;flex-shrink:0}
+
+/* Module row */
+.module-row{display:flex;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--border);gap:16px}
+.module-row:last-child{border-bottom:none;padding-bottom:0}
+.module-row:first-child{padding-top:4px}
+.module-index{width:24px;height:24px;border-radius:50%;background:#f5f7fa;color:var(--text-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:2px}
+.module-info{flex:1;min-width:0}
+.module-name{font-size:14px;font-weight:600;color:var(--primary-dark);margin-bottom:6px}
+.module-desc{font-size:12px;color:var(--text-light);margin-bottom:8px;line-height:1.5}
+.module-depts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.dept-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:4px;font-size:12px;background:#ecf5ff;color:#409EFF;border:1px solid #d9ecff;cursor:default;transition:all .15s}
+.dept-chip .remove{width:14px;height:14px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:#409EFF;transition:all .15s;margin-left:2px}
+.dept-chip .remove:hover{background:#409EFF;color:#fff}
+.add-dept-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 10px;border-radius:4px;font-size:12px;background:#f5f7fa;color:var(--text-light);border:1px dashed var(--border);cursor:pointer;transition:all .15s}
+.add-dept-btn:hover{border-color:var(--accent);color:var(--accent);background:#ecf5ff}
+
+/* Multi-select dropdown */
+.ms-dropdown{position:relative;display:inline-block}
+.ms-dropdown-menu{display:none;position:absolute;top:100%;left:0;z-index:200;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:8px 0;min-width:200px;max-height:260px;overflow-y:auto;margin-top:4px}
+.ms-dropdown-menu.open{display:block}
+.ms-dropdown-search{display:block;width:calc(100% - 16px);margin:0 8px 8px;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;font-size:12px;outline:none}
+.ms-dropdown-search:focus{border-color:var(--accent)}
+.ms-dropdown-item{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:13px;cursor:pointer;transition:background .1s}
+.ms-dropdown-item:hover{background:#f5f7fa}
+.ms-dropdown-item.selected{color:var(--accent);font-weight:500}
+.ms-dropdown-item input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+
+/* Expand/collapse arrow */
+.arrow{font-size:12px;color:#999;transition:transform .2s;display:inline-block}
+.arrow.open{transform:rotate(90deg)}
+
+/* Stats bar */
+.stats-bar{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.stat-item{background:var(--card);border-radius:6px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:12px;min-width:160px}
+.stat-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+.stat-val{font-size:22px;font-weight:700;color:var(--primary-dark)}
+.stat-label{font-size:12px;color:var(--text-light)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text);transition:all .2s;gap:4px;text-decoration:none}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#66b1ff;border-color:#66b1ff}
+.btn-success{background:var(--success);color:#fff;border-color:var(--success)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* Toast */
+.toast{position:fixed;top:20px;right:20px;z-index:9999;background:var(--success);color:#fff;padding:12px 24px;border-radius:6px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.error{background:var(--danger)}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo"><span>高邮督办管理系统</span></div>
+  <div class="sidebar-menu">
+    <a class="menu-item" href="index.html"><i class="icon">🏠</i>首页</a>
+    <a class="menu-item" href="#"><i class="icon">🏗</i>基础设施</a>
+    <a class="menu-item" href="#"><i class="icon">📋</i>督办管理</a>
+    <a class="menu-item" href="#"><i class="icon">📝</i>日常汇报</a>
+    <a class="menu-item" href="index.html"><i class="icon">📰</i>工作日报</a>
+    <a class="menu-item active" href="template-setting.html"><i class="icon">🔧</i>模板设置</a>
+    <a class="menu-item" href="#"><i class="icon">📊</i>KPI考核</a>
+    <a class="menu-item" href="#"><i class="icon">⚙</i>系统管理</a>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <span class="breadcrumb"><a href="index.html">首页</a> / <a href="#">工作日报</a> / 模板设置</span>
+    </div>
+    <div class="header-right">
+      <span class="user">系统管理员</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">日报模板设置</div>
+    <div class="page-desc">按模块拆分日报模板，为每个模块设置负责填写的部门。部门可多选，保存后即时生效。</div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-icon" style="background:linear-gradient(135deg,#409EFF,#66b1ff)">📋</div>
+        <div><div class="stat-val">6</div><div class="stat-label">大模块</div></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon" style="background:linear-gradient(135deg,#67C23A,#85ce61)">📦</div>
+        <div><div class="stat-val" id="statModules">21</div><div class="stat-label">子模块</div></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon" style="background:linear-gradient(135deg,#E6A23C,#ebb563)">🏢</div>
+        <div><div class="stat-val">18</div><div class="stat-label">参与部门</div></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon" style="background:linear-gradient(135deg,#F56C6C,#f89898)">🔗</div>
+        <div><div class="stat-val" id="statBindings">27</div><div class="stat-label">部门绑定</div></div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="toggleAll(true)">全部展开</button>
+        <button class="btn btn-sm" onclick="toggleAll(false)">全部折叠</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="resetAll()">恢复默认</button>
+        <button class="btn btn-primary btn-sm" onclick="saveAll()">保存设置</button>
+      </div>
+    </div>
+
+    <!-- Template sections container -->
+    <div id="sectionsContainer"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ===== 全部部门 =====
+var ALL_DEPTS = [
+  '情指中心','刑侦大队','治安大队','巡特警大队','网安大队','内保大队',
+  '出入境管理大队','督审大队','看守所','珠湖派出所','武安派出所',
+  '菱塘派出所','天山派出所','卸甲派出所','三垛派出所','临泽派出所',
+  '甘垛派出所','开发区派出所'
+];
+
+// ===== 模板结构定义 =====
+var SECTIONS = [
+  {
+    title: '一、警务动态',
+    icon: '📢',
+    color: '#409EFF',
+    modules: [
+      { id:'jw_dt_qz', name:'各警种报送', desc:'各警种部门报送当日警务动态内容', depts:['情指中心','刑侦大队','治安大队','巡特警大队'] }
+    ]
+  },
+  {
+    title: '二、今日警情',
+    icon: '🚨',
+    color: '#F56C6C',
+    modules: [
+      { id:'jq_gk', name:'（一）有效警情全量统计', desc:'全市各单位有效警情数据统计表', depts:['情指中心'] },
+      { id:'jq_zy', name:'（二）重要警情', desc:'当日重要警情信息报送', depts:['情指中心','刑侦大队'] },
+      { id:'jq_sx', name:'（三）涉校涉未警情', desc:'涉及校园及未成年人的警情', depts:['内保大队'] },
+      { id:'jq_zd', name:'（四）重点案事件续报', desc:'重点案件和事件的后续跟进', depts:['情指中心','刑侦大队'] }
+    ]
+  },
+  {
+    title: '三、社会稳定',
+    icon: '⚖️',
+    color: '#E6A23C',
+    modules: [
+      { id:'wd_fq', name:'（一）今日访情', desc:'进京访、本地访、票务及处置', depts:['治安大队','情指中心'] },
+      { id:'wd_yq', name:'（二）今日舆情', desc:'网络舆情监测及报送', depts:['网安大队'] },
+      { id:'wd_hc', name:'（三）核查指令', desc:'省厅下发涉稳核查指令', depts:['情指中心'] }
+    ]
+  },
+  {
+    title: '四、打击破案',
+    icon: '🎯',
+    color: '#67C23A',
+    modules: [
+      { id:'dj_fb', name:'（一）发案破案', desc:'刑事、治安案件发破案情况统计', depts:['刑侦大队','治安大队','情指中心'] },
+      { id:'dj_ry', name:'（二）人员抓获', desc:'抓获各类违法犯罪人员情况', depts:['刑侦大队','治安大队'] },
+      { id:'dj_dqp', name:'（三）盗抢骗发破案', desc:'盗窃、抢劫、诈骗案件统计', depts:['刑侦大队'] },
+      { id:'dj_dz', name:'（四）电诈犯罪', desc:'电信网络诈骗案件情况', depts:['刑侦大队'] }
+    ]
+  },
+  {
+    title: '五、基础管控',
+    icon: '🛡️',
+    color: '#8E44AD',
+    modules: [
+      { id:'jc_zh', name:'（一）综合指挥室', desc:'处警问题数据、敏感警情反应速度、大运合平台赋能', depts:['情指中心'] },
+      { id:'jc_qb', name:'（二）情报信息报送', desc:'各警种情报信息汇总报送', depts:['情指中心','出入境管理大队','网安大队','刑侦大队'] },
+      { id:'jc_za', name:'（三）治安风险防控', desc:'治安隐患排查与风险防控情况', depts:['治安大队'] },
+      { id:'jc_xf', name:'（四）巡防情况', desc:'街面巡防及巡逻工作开展情况', depts:['巡特警大队'] },
+      { id:'jc_fz', name:'（五）反诈工作', desc:'反诈预警劝阻、宣传等工作', depts:['刑侦大队'] },
+      { id:'jc_js', name:'（六）监所管理', desc:'看守所收押、管理等情况', depts:['看守所'] },
+      { id:'jc_cr', name:'（七）出入境管理', desc:'出入境证件办理、境外人员管理等', depts:['出入境管理大队'] }
+    ]
+  },
+  {
+    title: '六、督审工作',
+    icon: '📝',
+    color: '#3498DB',
+    modules: [
+      { id:'ds_dw', name:'（一）队伍管理', desc:'12345平台工单、队伍纪律作风等', depts:['督审大队'] },
+      { id:'ds_my', name:'（二）民意访评质态', desc:'民意调查、满意度测评等', depts:['督审大队'] },
+      { id:'ds_xf', name:'（三）信访积案化解', desc:'信访事项办理及积案化解情况', depts:['督审大队'] }
+    ]
+  }
+];
+
+// ===== 默认配置（用于恢复） =====
+var DEFAULT_CONFIG = JSON.parse(JSON.stringify(SECTIONS));
+
+// ===== 当前配置 =====
+var config = JSON.parse(JSON.stringify(SECTIONS));
+
+// ===== 渲染 =====
+function render() {
+  var container = document.getElementById('sectionsContainer');
+  var html = '';
+
+  config.forEach(function(sec, si) {
+    var isOpen = !sec._collapsed;
+    html += '<div class="card" data-sec="' + si + '">';
+    html += '<div class="card-header" onclick="toggleSection(' + si + ')">';
+    html += '<h3><span class="sec-icon" style="background:' + sec.color + '">' + sec.icon + '</span>' + sec.title + '<span style="font-size:12px;color:var(--text-light);font-weight:400;margin-left:8px">(' + sec.modules.length + '个子模块)</span></h3>';
+    html += '<span class="arrow' + (isOpen ? ' open' : '') + '">▶</span>';
+    html += '</div>';
+    html += '<div class="card-body' + (isOpen ? '' : ' collapsed') + '">';
+
+    sec.modules.forEach(function(mod, mi) {
+      html += '<div class="module-row">';
+      html += '<div class="module-index">' + (mi + 1) + '</div>';
+      html += '<div class="module-info">';
+      html += '<div class="module-name">' + mod.name + '</div>';
+      html += '<div class="module-desc">' + mod.desc + '</div>';
+      html += '<div class="module-depts" id="depts-' + mod.id + '">';
+
+      // 已选部门标签
+      mod.depts.forEach(function(d, di) {
+        html += '<span class="dept-chip">' + d + '<span class="remove" onclick="removeDept(' + si + ',' + mi + ',' + di + ',event)">&times;</span></span>';
+      });
+
+      // 添加部门按钮
+      html += '<span class="add-dept-btn" onclick="openDropdown(event,' + si + ',' + mi + ')">+ 添加部门</span>';
+
+      html += '</div>'; // module-depts
+      html += '</div>'; // module-info
+      html += '</div>'; // module-row
+    });
+
+    html += '</div>'; // card-body
+    html += '</div>'; // card
+  });
+
+  container.innerHTML = html;
+  updateStats();
+}
+
+// ===== 展开/折叠 =====
+function toggleSection(si) {
+  config[si]._collapsed = !config[si]._collapsed;
+  render();
+}
+
+function toggleAll(open) {
+  config.forEach(function(sec) { sec._collapsed = !open; });
+  render();
+}
+
+// ===== 移除部门 =====
+function removeDept(si, mi, di, e) {
+  e.stopPropagation();
+  config[si].modules[mi].depts.splice(di, 1);
+  render();
+}
+
+// ===== 多选下拉 =====
+var currentDropdown = null;
+
+function openDropdown(e, si, mi) {
+  e.stopPropagation();
+  closeDropdown();
+
+  var mod = config[si].modules[mi];
+  var selectedSet = {};
+  mod.depts.forEach(function(d) { selectedSet[d] = true; });
+
+  var available = ALL_DEPTS.filter(function(d) { return !selectedSet[d]; });
+
+  // 创建下拉菜单
+  var menu = document.createElement('div');
+  menu.className = 'ms-dropdown-menu open';
+  menu.style.cssText = 'position:fixed;z-index:500;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);padding:8px 0;min-width:210px;max-height:280px;overflow-y:auto';
+
+  // 搜索框
+  var search = document.createElement('input');
+  search.type = 'text';
+  search.placeholder = '搜索部门...';
+  search.className = 'ms-dropdown-search';
+  search.style.cssText = 'display:block;width:calc(100% - 16px);margin:0 8px 8px;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;font-size:12px;outline:none';
+  menu.appendChild(search);
+
+  // 选项列表
+  var listDiv = document.createElement('div');
+  available.forEach(function(d) {
+    var item = document.createElement('div');
+    item.className = 'ms-dropdown-item';
+    item.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:13px;cursor:pointer;transition:background .1s';
+    item.innerHTML = '<input type="checkbox" style="accent-color:#409EFF;width:15px;height:15px;cursor:pointer"><span>' + d + '</span>';
+    item._deptName = d;
+
+    item.addEventListener('click', function(ev) {
+      var cb = item.querySelector('input[type=checkbox]');
+      if (ev.target !== cb) cb.checked = !cb.checked;
+      if (cb.checked) {
+        item.style.color = '#409EFF';
+        item.style.fontWeight = '500';
+      } else {
+        item.style.color = '';
+        item.style.fontWeight = '';
+      }
+    });
+
+    item.addEventListener('mouseenter', function() { item.style.background = '#f5f7fa'; });
+    item.addEventListener('mouseleave', function() { item.style.background = ''; });
+
+    listDiv.appendChild(item);
+  });
+  menu.appendChild(listDiv);
+
+  // 底部确认按钮
+  var footer = document.createElement('div');
+  footer.style.cssText = 'padding:8px 14px 4px;border-top:1px solid var(--border);margin-top:4px;display:flex;justify-content:flex-end;gap:6px';
+  footer.innerHTML = '<button class="btn btn-sm" onclick="closeDropdown()" style="padding:4px 12px;font-size:12px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer">取消</button><button class="btn btn-primary btn-sm" id="dropdownConfirm" style="padding:4px 12px;font-size:12px;border:none;border-radius:4px;background:#409EFF;color:#fff;cursor:pointer">确认</button>';
+  menu.appendChild(footer);
+
+  document.body.appendChild(menu);
+
+  // 定位
+  var rect = e.target.getBoundingClientRect();
+  var left = rect.left;
+  var top = rect.bottom + 4;
+  if (left + 210 > window.innerWidth) left = window.innerWidth - 220;
+  if (top + 280 > window.innerHeight) top = rect.top - 280 - 4;
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+
+  // 搜索过滤
+  search.addEventListener('input', function() {
+    var kw = search.value.trim().toLowerCase();
+    var items = listDiv.querySelectorAll('.ms-dropdown-item');
+    items.forEach(function(item) {
+      var name = item._deptName.toLowerCase();
+      item.style.display = name.indexOf(kw) >= 0 ? '' : 'none';
+    });
+  });
+
+  search.focus();
+
+  // 确认按钮
+  document.getElementById('dropdownConfirm').addEventListener('click', function() {
+    var items = listDiv.querySelectorAll('.ms-dropdown-item');
+    items.forEach(function(item) {
+      var cb = item.querySelector('input[type=checkbox]');
+      if (cb.checked) {
+        config[si].modules[mi].depts.push(item._deptName);
+      }
+    });
+    closeDropdown();
+    render();
+  });
+
+  currentDropdown = menu;
+}
+
+function closeDropdown() {
+  if (currentDropdown) {
+    document.body.removeChild(currentDropdown);
+    currentDropdown = null;
+  }
+}
+
+// 点击空白关闭下拉
+document.addEventListener('click', function(e) {
+  if (currentDropdown && !currentDropdown.contains(e.target)) {
+    closeDropdown();
+  }
+});
+
+// ===== 统计更新 =====
+function updateStats() {
+  var totalModules = 0;
+  var totalBindings = 0;
+  config.forEach(function(sec) {
+    totalModules += sec.modules.length;
+    sec.modules.forEach(function(mod) {
+      totalBindings += mod.depts.length;
+    });
+  });
+  document.getElementById('statModules').textContent = totalModules;
+  document.getElementById('statBindings').textContent = totalBindings;
+}
+
+// ===== 恢复默认 =====
+function resetAll() {
+  config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  render();
+  showToast('已恢复默认设置', false);
+}
+
+// ===== 保存 =====
+function saveAll() {
+  // 校验：每个子模块至少有一个部门
+  var hasEmpty = false;
+  config.forEach(function(sec) {
+    sec.modules.forEach(function(mod) {
+      if (mod.depts.length === 0) hasEmpty = true;
+    });
+  });
+
+  if (hasEmpty) {
+    showToast('存在未分配部门的子模块，请检查后再保存', true);
+    return;
+  }
+
+  // 模拟保存（实际项目对接后端API）
+  localStorage.setItem('dailyReportTemplateConfig', JSON.stringify(config));
+  showToast('模板设置保存成功', false);
+}
+
+// ===== Toast =====
+function showToast(msg, isError) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  setTimeout(function() { t.classList.add('show'); }, 10);
+  setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+// ===== 初始化 =====
+// 尝试从 localStorage 恢复
+var saved = localStorage.getItem('dailyReportTemplateConfig');
+if (saved) {
+  try {
+    var parsed = JSON.parse(saved);
+    // 保留折叠状态
+    config = parsed;
+  } catch(e) {}
+}
+render();
+</script>
+</body>
+</html>
