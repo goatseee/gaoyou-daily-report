@@ -108,6 +108,28 @@ select.form-control{appearance:auto}
 .print-header h1{font-size:22px;color:#c00;font-weight:700;letter-spacing:2px}
 .print-header .meta{font-size:13px;color:var(--text-light);margin-top:6px}
 .secret-mark{color:#c00;font-size:12px;font-weight:600;float:right}
+/* Dept popup */
+.dept-link{color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.dept-link:hover{color:#66b1ff}
+.dept-popup-mask{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:900}
+.dept-popup{display:none;position:fixed;z-index:1000;background:#fff;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:0;min-width:340px;max-width:420px;font-size:13px;animation:popIn .15s ease}
+@keyframes popIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.dept-popup-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.dept-popup-header h4{font-size:14px;font-weight:600;color:var(--primary-dark);margin:0}
+.dept-popup-close{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#999;font-size:16px;transition:all .2s;border:none;background:none}
+.dept-popup-close:hover{background:#f5f5f5;color:#333}
+.dept-popup-body{padding:14px 18px;max-height:360px;overflow-y:auto}
+.dept-popup-section{margin-bottom:12px}
+.dept-popup-section:last-child{margin-bottom:0}
+.dept-popup-section-title{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dept-popup-section-title .count{font-weight:400;color:var(--text-light)}
+.dept-popup-grid{display:flex;flex-wrap:wrap;gap:6px}
+.dept-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:4px;font-size:12px}
+.dept-chip.submitted{background:#f0f9eb;color:#67C23A;border:1px solid #e1f3d8}
+.dept-chip.not-submitted{background:#fef0f0;color:#F56C6C;border:1px solid #fde2e2;opacity:0.7}
+.dept-chip .chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dept-chip.submitted .chip-dot{background:#67C23A}
+.dept-chip.not-submitted .chip-dot{background:#F56C6C}
 </style>
 </head>
 <body>
@@ -177,11 +199,11 @@ select.form-control{appearance:auto}
               <tr><th style="width:40px">序号</th><th>日期</th><th>日报标题</th><th>填写进度</th><th>状态</th><th>已提交部门</th><th>操作人</th><th>更新时间</th><th style="width:180px">操作</th></tr>
             </thead>
             <tbody>
-              <tr><td>1</td><td>2026-06-17</td><td class="left">高邮公安工作日报（6月17日）</td><td><span class="badge badge-blue">12/18</span></td><td><span class="badge badge-orange">填写中</span></td><td>12/18</td><td>情指中心</td><td>2026-06-17 15:30</td><td><button class="btn btn-sm" onclick="switchTab('fill')">继续填写</button> <button class="btn btn-sm" onclick="switchTab('preview')">预览</button></td></tr>
-              <tr><td>2</td><td>2026-06-16</td><td class="left">高邮公安工作日报（6月16日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>18/18</td><td>情指中心</td><td>2026-06-16 17:45</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
-              <tr><td>3</td><td>2026-06-15</td><td class="left">高邮公安工作日报（6月15日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>18/18</td><td>情指中心</td><td>2026-06-15 17:20</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
-              <tr><td>4</td><td>2026-06-14</td><td class="left">高邮公安工作日报（6月14日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>18/18</td><td>情指中心</td><td>2026-06-14 17:00</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
-              <tr><td>5</td><td>2026-06-13</td><td class="left">高邮公安工作日报（6月13日）</td><td><span class="badge badge-green">17/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>17/18</td><td>情指中心</td><td>2026-06-13 17:30</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>1</td><td>2026-06-17</td><td class="left">高邮公安工作日报（6月17日）</td><td><span class="badge badge-blue">12/18</span></td><td><span class="badge badge-orange">填写中</span></td><td><span class="dept-link" onclick="showDeptPopup(event,0)">12/18</span></td><td>情指中心</td><td>2026-06-17 15:30</td><td><button class="btn btn-sm" onclick="switchTab('fill')">继续填写</button> <button class="btn btn-sm" onclick="switchTab('preview')">预览</button></td></tr>
+              <tr><td>2</td><td>2026-06-16</td><td class="left">高邮公安工作日报（6月16日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td><span class="dept-link" onclick="showDeptPopup(event,1)">18/18</span></td><td>情指中心</td><td>2026-06-16 17:45</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>3</td><td>2026-06-15</td><td class="left">高邮公安工作日报（6月15日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td><span class="dept-link" onclick="showDeptPopup(event,2)">18/18</span></td><td>情指中心</td><td>2026-06-15 17:20</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>4</td><td>2026-06-14</td><td class="left">高邮公安工作日报（6月14日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td><span class="dept-link" onclick="showDeptPopup(event,3)">18/18</span></td><td>情指中心</td><td>2026-06-14 17:00</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>5</td><td>2026-06-13</td><td class="left">高邮公安工作日报（6月13日）</td><td><span class="badge badge-green">17/18</span></td><td><span class="badge badge-green">已汇总</span></td><td><span class="dept-link" onclick="showDeptPopup(event,4)">17/18</span></td><td>情指中心</td><td>2026-06-13 17:30</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
             </tbody>
           </table>
         </div>
@@ -429,6 +451,98 @@ select.form-control{appearance:auto}
 </div>
 
 <script>
+// 全部18个部门
+var ALL_DEPTS = ['情指中心','刑侦大队','治安大队','巡特警大队','网安大队','内保大队','出入境管理大队','督审大队','看守所','珠湖派出所','武安派出所','菱塘派出所','天山派出所','卸甲派出所','三垛派出所','临泽派出所','甘垛派出所','开发区派出所'];
+
+// 每行日报对应的已提交部门索引 (0-based)
+var ROW_DEPT_DATA = [
+  // 第1行: 6月17日, 12/18
+  [0,1,2,3,4,5,7,9,10,11,14,17],
+  // 第2行: 6月16日, 18/18 全部
+  [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],
+  // 第3行: 6月15日, 18/18 全部
+  [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],
+  // 第4行: 6月14日, 18/18 全部
+  [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17],
+  // 第5行: 6月13日, 17/18 (看守所未提交)
+  [0,1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17],
+];
+
+var ROW_DATES = ['6月17日','6月16日','6月15日','6月14日','6月13日'];
+
+function showDeptPopup(e, rowIndex) {
+  var submitted = ROW_DEPT_DATA[rowIndex];
+  var submittedSet = {};
+  submitted.forEach(function(i){ submittedSet[i]=true; });
+
+  var submittedList = [];
+  var notList = [];
+  ALL_DEPTS.forEach(function(name, i) {
+    if (submittedSet[i]) {
+      submittedList.push(name);
+    } else {
+      notList.push(name);
+    }
+  });
+
+  // 构建弹窗内容
+  var html = '<div class="dept-popup-header"><h4>部门提交情况（' + ROW_DATES[rowIndex] + '）</h4><button class="dept-popup-close" onclick="closeDeptPopup()">&times;</button></div>';
+  html += '<div class="dept-popup-body">';
+
+  // 已提交
+  html += '<div class="dept-popup-section">';
+  html += '<div class="dept-popup-section-title" style="color:#67C23A"><span class="status-dot dot-green"></span>已提交 <span class="count">(' + submittedList.length + '个)</span></div>';
+  html += '<div class="dept-popup-grid">';
+  submittedList.forEach(function(name) {
+    html += '<span class="dept-chip submitted"><span class="chip-dot"></span>' + name + '</span>';
+  });
+  html += '</div></div>';
+
+  // 未提交
+  if (notList.length > 0) {
+    html += '<div class="dept-popup-section">';
+    html += '<div class="dept-popup-section-title" style="color:#F56C6C"><span class="status-dot dot-red"></span>未提交 <span class="count">(' + notList.length + '个)</span></div>';
+    html += '<div class="dept-popup-grid">';
+    notList.forEach(function(name) {
+      html += '<span class="dept-chip not-submitted"><span class="chip-dot"></span>' + name + '</span>';
+    });
+    html += '</div></div>';
+  }
+
+  html += '</div>';
+
+  // 定位弹窗
+  var popup = document.getElementById('deptPopup');
+  var mask = document.getElementById('deptPopupMask');
+  popup.innerHTML = html;
+
+  var rect = e.target.getBoundingClientRect();
+  var left = rect.left;
+  var top = rect.bottom + 8;
+
+  // 防止超出视窗右侧
+  if (left + 380 > window.innerWidth) {
+    left = window.innerWidth - 400;
+  }
+  // 防止超出视窗底部
+  if (top + 300 > window.innerHeight) {
+    top = rect.top - 8;
+    popup.style.transform = 'translateY(-100%)';
+  } else {
+    popup.style.transform = 'none';
+  }
+
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  popup.style.display = 'block';
+  mask.style.display = 'block';
+}
+
+function closeDeptPopup() {
+  document.getElementById('deptPopup').style.display = 'none';
+  document.getElementById('deptPopupMask').style.display = 'none';
+}
+
 function switchTab(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -439,5 +553,9 @@ function switchTab(id){
   window.scrollTo(0,0);
 }
 </script>
+<!-- 部门提交状态弹窗 -->
+<div id="deptPopupMask" class="dept-popup-mask" onclick="closeDeptPopup()"></div>
+<div id="deptPopup" class="dept-popup"></div>
+
 </body>
 </html>
