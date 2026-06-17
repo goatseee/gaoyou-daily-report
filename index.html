@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高邮公安工作日报 - 督办管理系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#304156;--primary-light:#409EFF;--primary-dark:#1d2b3a;--accent:#409EFF;--bg:#f0f2f5;--card:#fff;--text:#333;--text-light:#666;--border:#e4e7ed;--success:#67C23A;--warning:#E6A23C;--danger:#F56C6C;--info:#909399}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+/* Sidebar */
+.sidebar{width:210px;background:var(--primary);color:#fff;flex-shrink:0;display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:100}
+.sidebar-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo img{width:28px;height:28px;margin-right:10px}
+.sidebar-logo span{font-size:14px;font-weight:600;white-space:nowrap}
+.sidebar-menu{flex:1;overflow-y:auto;padding:8px 0}
+.menu-item{padding:0 16px;height:44px;display:flex;align-items:center;color:#bfcbd9;cursor:pointer;transition:all .2s;font-size:13px;text-decoration:none;position:relative}
+.menu-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.menu-item.active{background:var(--accent);color:#fff}
+.menu-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#fff}
+.menu-item .icon{width:18px;height:18px;margin-right:10px;text-align:center;font-style:normal}
+.menu-sub{padding-left:28px}
+/* Main */
+.main{margin-left:210px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;box-shadow:0 1px 4px rgba(0,0,0,.08);position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left .breadcrumb{font-size:13px;color:var(--text-light)}
+.header-left .breadcrumb a{color:var(--accent);text-decoration:none}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-right .user{font-size:13px;color:var(--text-light);cursor:pointer}
+.content{flex:1;padding:20px}
+/* Cards */
+.page-title{font-size:18px;font-weight:600;color:var(--primary-dark);margin-bottom:16px}
+.card{background:var(--card);border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:16px}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.card-header h3{font-size:15px;color:var(--primary-dark);font-weight:600}
+.card-body{padding:20px}
+/* Tabs */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 20px;cursor:pointer;font-size:14px;color:var(--text-light);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab:hover{color:var(--accent)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f5f7fa;color:var(--text-light);font-weight:600;padding:10px 8px;text-align:center;border:1px solid var(--border);white-space:nowrap}
+td{padding:8px;text-align:center;border:1px solid var(--border);vertical-align:middle}
+td.left{text-align:left;padding:8px 12px}
+tr:hover td{background:#f5f7fa}
+/* Stat cards */
+.stats{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.stat-card{flex:1;min-width:140px;background:var(--card);border-radius:6px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px}
+.stat-card .icon-box{width:48px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0}
+.stat-card .info .label{font-size:12px;color:var(--text-light);margin-bottom:4px}
+.stat-card .info .value{font-size:24px;font-weight:700;color:var(--primary-dark)}
+/* Form */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--text-light);margin-bottom:6px;font-weight:500}
+.form-group label .required{color:var(--danger);margin-left:2px}
+.form-control{width:100%;height:36px;border:1px solid var(--border);border-radius:4px;padding:0 12px;font-size:13px;outline:none;transition:border-color .2s}
+.form-control:focus{border-color:var(--accent)}
+textarea.form-control{height:auto;min-height:80px;padding:8px 12px;resize:vertical}
+select.form-control{appearance:auto}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 20px;border-radius:4px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text);transition:all .2s;gap:4px;text-decoration:none}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#66b1ff;border-color:#66b1ff}
+.btn-success{background:var(--success);color:#fff;border-color:var(--success)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-sm{padding:5px 12px;font-size:12px}
+/* Badge */
+.badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:500}
+.badge-blue{background:#ecf5ff;color:#409EFF}
+.badge-green{background:#f0f9eb;color:#67C23A}
+.badge-red{background:#fef0f0;color:#F56C6C}
+.badge-orange{background:#fdf6ec;color:#E6A23C}
+.badge-gray{background:#f4f4f5;color:#909399}
+/* Section title */
+.section-title{font-size:14px;font-weight:600;color:var(--primary-dark);padding:10px 0;margin-top:12px;border-left:3px solid var(--accent);padding-left:10px}
+.sub-title{font-size:13px;font-weight:600;color:var(--text);margin:12px 0 8px}
+.dept-tag{font-size:11px;color:var(--accent);background:#ecf5ff;padding:1px 6px;border-radius:3px;margin-left:6px}
+/* Empty state */
+.empty{text-align:center;padding:40px;color:var(--text-light);font-size:13px}
+/* Tab panels */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* Schedule grid */
+.schedule-grid{display:grid;grid-template-columns:120px 1fr;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.schedule-grid .sg-label{background:#f5f7fa;padding:10px 12px;font-size:13px;font-weight:500;color:var(--text-light);border-bottom:1px solid var(--border);display:flex;align-items:center}
+.schedule-grid .sg-value{padding:10px 12px;border-bottom:1px solid var(--border);border-left:1px solid var(--border)}
+.schedule-grid .sg-value:last-child,.schedule-grid .sg-label:last-child{border-bottom:none}
+/* Date picker row */
+.date-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.date-row .form-control{width:160px}
+/* Toolbar */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.toolbar-left{display:flex;align-items:center;gap:8px}
+.toolbar-right{display:flex;align-items:center;gap:8px}
+/* Status dot */
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot-green{background:var(--success)}
+.dot-orange{background:var(--warning)}
+.dot-red{background:var(--danger)}
+.dot-gray{background:var(--info)}
+/* Print style */
+.print-header{text-align:center;margin-bottom:20px}
+.print-header h1{font-size:22px;color:#c00;font-weight:700;letter-spacing:2px}
+.print-header .meta{font-size:13px;color:var(--text-light);margin-top:6px}
+.secret-mark{color:#c00;font-size:12px;font-weight:600;float:right}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo"><span>高邮督办管理系统</span></div>
+  <div class="sidebar-menu">
+    <a class="menu-item" href="#"><i class="icon">🏠</i>首页</a>
+    <a class="menu-item" href="#"><i class="icon">🏗</i>基础设施</a>
+    <a class="menu-item" href="#"><i class="icon">📋</i>督办管理</a>
+    <a class="menu-item" href="#"><i class="icon">📝</i>日常汇报</a>
+    <a class="menu-item active" href="#"><i class="icon">📰</i>工作日报</a>
+    <a class="menu-item" href="#"><i class="icon">📊</i>KPI考核</a>
+    <a class="menu-item" href="#"><i class="icon">⚙</i>系统管理</a>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <span class="breadcrumb"><a href="#">首页</a> / <a href="#">工作日报</a> / 日报管理</span>
+    </div>
+    <div class="header-right">
+      <span class="user">情指中心 · 张三</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">工作日报管理</div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card"><div class="icon-box" style="background:linear-gradient(135deg,#409EFF,#66b1ff)">📰</div><div class="info"><div class="label">今日日报</div><div class="value">1</div></div></div>
+      <div class="stat-card"><div class="icon-box" style="background:linear-gradient(135deg,#67C23A,#85ce61)">✅</div><div class="info"><div class="label">已提交部门</div><div class="value">12</div></div></div>
+      <div class="stat-card"><div class="icon-box" style="background:linear-gradient(135deg,#E6A23C,#ebb563)">⏳</div><div class="info"><div class="label">待提交部门</div><div class="value">6</div></div></div>
+      <div class="stat-card"><div class="icon-box" style="background:linear-gradient(135deg,#F56C6C,#f89898)">⚠</div><div class="info"><div class="label">超时未报</div><div class="value">1</div></div></div>
+      <div class="stat-card"><div class="icon-box" style="background:linear-gradient(135deg,#909399,#b1b3b8)">📋</div><div class="info"><div class="label">本月累计</div><div class="value">28</div></div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('list')">日报列表</div>
+      <div class="tab" onclick="switchTab('fill')">填写日报</div>
+      <div class="tab" onclick="switchTab('preview')">日报预览</div>
+    </div>
+
+    <!-- Tab: 日报列表 -->
+    <div id="tab-list" class="tab-panel active">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="date" class="form-control" value="2026-06-17" style="width:150px">
+          <select class="form-control" style="width:120px"><option>全部状态</option><option>已汇总</option><option>填写中</option><option>待提交</option></select>
+          <button class="btn btn-primary btn-sm">查询</button>
+          <button class="btn btn-sm">重置</button>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-primary btn-sm" onclick="switchTab('fill')">+ 新建日报</button>
+          <button class="btn btn-sm">导出Excel</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th style="width:40px">序号</th><th>日期</th><th>日报标题</th><th>填写进度</th><th>状态</th><th>已提交部门</th><th>操作人</th><th>更新时间</th><th style="width:180px">操作</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td>2026-06-17</td><td class="left">高邮公安工作日报（6月17日）</td><td><span class="badge badge-blue">12/18</span></td><td><span class="badge badge-orange">填写中</span></td><td>12/18</td><td>情指中心</td><td>2026-06-17 15:30</td><td><button class="btn btn-sm" onclick="switchTab('fill')">继续填写</button> <button class="btn btn-sm" onclick="switchTab('preview')">预览</button></td></tr>
+              <tr><td>2</td><td>2026-06-16</td><td class="left">高邮公安工作日报（6月16日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>18/18</td><td>情指中心</td><td>2026-06-16 17:45</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>3</td><td>2026-06-15</td><td class="left">高邮公安工作日报（6月15日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>18/18</td><td>情指中心</td><td>2026-06-15 17:20</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>4</td><td>2026-06-14</td><td class="left">高邮公安工作日报（6月14日）</td><td><span class="badge badge-green">18/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>18/18</td><td>情指中心</td><td>2026-06-14 17:00</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+              <tr><td>5</td><td>2026-06-13</td><td class="left">高邮公安工作日报（6月13日）</td><td><span class="badge badge-green">17/18</span></td><td><span class="badge badge-green">已汇总</span></td><td>17/18</td><td>情指中心</td><td>2026-06-13 17:30</td><td><button class="btn btn-sm" onclick="switchTab('preview')">查看</button> <button class="btn btn-sm">导出</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: 填写日报 -->
+    <div id="tab-fill" class="tab-panel">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <span style="font-size:15px;font-weight:600;color:var(--primary-dark)">填写日报 — 2026年6月17日</span>
+          <span class="badge badge-orange">当前角色：情指中心</span>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-sm" onclick="switchTab('list')">返回列表</button>
+          <button class="btn btn-primary btn-sm">暂存草稿</button>
+          <button class="btn btn-success btn-sm">提交审核</button>
+        </div>
+      </div>
+
+      <div style="background:#fff4e6;border:1px solid #faecd8;border-radius:4px;padding:10px 16px;margin-bottom:16px;font-size:13px;color:#e6a23c">
+        提示：您当前以<span style="font-weight:600">情指中心</span>身份登录，只能填写本部门负责的板块（已标蓝高亮）。其他部门板块显示为只读状态。
+      </div>
+
+      <!-- 一、警务动态 -->
+      <div class="card">
+        <div class="card-header"><h3>一、警务动态</h3><span class="dept-tag">各警种报送</span></div>
+        <div class="card-body">
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>情指中心报送内容 <span class="required">*</span></label>
+            <textarea class="form-control" rows="4" placeholder="请填写情指中心警务动态内容...">（一）情指中心。今日指挥调度警力XX人次，处置各类警情XX起，其中...</textarea>
+          </div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none">
+            <label>刑侦大队报送内容</label>
+            <textarea class="form-control" rows="3" readonly placeholder="等待刑侦大队填写..."></textarea>
+          </div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none">
+            <label>治安大队报送内容</label>
+            <textarea class="form-control" rows="3" readonly placeholder="等待治安大队填写..."></textarea>
+          </div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none">
+            <label>巡特警大队报送内容</label>
+            <textarea class="form-control" rows="3" readonly placeholder="等待巡特警大队填写..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 二、今日警情 -->
+      <div class="card">
+        <div class="card-header"><h3>二、今日警情</h3><span class="dept-tag">情指中心报送</span></div>
+        <div class="card-body">
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>今日警情概况 <span class="required">*</span></label>
+            <textarea class="form-control" rows="3" placeholder="X月X日X时至X日X时，全市共接警X起，派处警情X起...">6月17日8时至6月17日20时，全市共接警86起，派处警情72起，其中违法犯罪类警情15起，环比下降8%，同比下降12%。</textarea>
+          </div>
+
+          <div class="sub-title">（一）有效警情全量统计 <span class="dept-tag" style="margin-left:8px">情指中心报送</span></div>
+          <div class="table-wrap" style="background:#ecf5ff;border-radius:4px;padding:8px;border-left:3px solid #409EFF">
+            <table>
+              <thead>
+                <tr><th rowspan="2">单位</th><th rowspan="2">总数</th><th colspan="3">刑事警情</th><th colspan="3">治安警情</th><th rowspan="2">纠纷</th><th rowspan="2">道路交通</th><th rowspan="2">紧急求助</th><th rowspan="2">其他</th></tr>
+                <tr><th>八类</th><th>盗窃</th><th>电诈</th><th>娼赌</th><th>殴打他人</th><th>盗窃电诈</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>警务站</td><td><input class="form-control" style="width:60px;height:28px;text-align:center" value="8"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="2"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="1"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="3"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="6"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="4"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="2"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td></tr>
+                <tr><td>珠湖</td><td><input class="form-control" style="width:60px;height:28px;text-align:center" value="5"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="1"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="2"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="1"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="3"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="2"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center" value="1"></td><td><input class="form-control" style="width:50px;height:28px;text-align:center"></td></tr>
+                <tr style="background:#f0f9eb;font-weight:600"><td>合计</td><td>72</td><td>2</td><td>8</td><td>12</td><td>1</td><td>15</td><td>3</td><td>20</td><td>18</td><td>8</td><td>5</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="sub-title">（二）重要警情 <span class="dept-tag" style="margin-left:8px">情指中心、刑侦大队报送</span></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>情指中心报送 <span class="required">*</span></label>
+            <textarea class="form-control" rows="3" placeholder="请填写重要警情..."></textarea>
+          </div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none">
+            <label>刑侦大队报送</label>
+            <textarea class="form-control" rows="3" readonly placeholder="等待刑侦大队填写..."></textarea>
+          </div>
+
+          <div class="sub-title">（三）涉校涉未警情 <span class="dept-tag" style="margin-left:8px">内保大队报送</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none">
+            <textarea class="form-control" rows="3" readonly placeholder="等待内保大队填写..."></textarea>
+          </div>
+
+          <div class="sub-title">（四）重点案事件续报 <span class="dept-tag" style="margin-left:8px">情指中心、刑侦大队报送</span></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>情指中心报送</label>
+            <textarea class="form-control" rows="3" placeholder="请填写重点案事件续报..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三、社会稳定 -->
+      <div class="card">
+        <div class="card-header"><h3>三、社会稳定</h3></div>
+        <div class="card-body">
+          <div class="sub-title">（一）今日访情 <span class="dept-tag" style="margin-left:8px">治安大队报送</span><span class="dept-tag" style="margin-left:4px;background:#ffe8e8;color:#F56C6C">情指中心报送本地访、需关注</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><label>1. 进京访</label><textarea class="form-control" rows="2" readonly placeholder="等待治安大队填写..."></textarea></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF"><label>2. 本地访 <span class="required">*</span></label><textarea class="form-control" rows="2" placeholder="请填写本地访情况..."></textarea></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><label>3. 票务及处置</label><textarea class="form-control" rows="2" readonly placeholder="等待治安大队填写..."></textarea></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF"><label>4. 需关注 <span class="required">*</span></label><textarea class="form-control" rows="2" placeholder="请填写需关注事项..."></textarea></div>
+
+          <div class="sub-title">（二）今日舆情 <span class="dept-tag" style="margin-left:8px">网安大队报送</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待网安大队填写..."></textarea></div>
+
+          <div class="sub-title">（三）核查指令 <span class="dept-tag" style="margin-left:8px">情指中心报送</span></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>核查指令内容 <span class="required">*</span></label>
+            <textarea class="form-control" rows="3" placeholder="X月X日X时至X日X时，省厅下发涉稳指令X条X人..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 四、打击破案 -->
+      <div class="card">
+        <div class="card-header"><h3>四、打击破案</h3></div>
+        <div class="card-body">
+          <div class="sub-title">（一）发案破案 <span class="dept-tag" style="margin-left:8px">刑侦大队、治安大队、情指中心报送</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><label>1. 刑侦大队报送</label><textarea class="form-control" rows="2" readonly placeholder="等待刑侦大队填写..."></textarea></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><label>2. 治安大队报送</label><textarea class="form-control" rows="2" readonly placeholder="等待治安大队填写..."></textarea></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF"><label>3. 全市刑事案件发破案情况（情指中心报送）</label><textarea class="form-control" rows="2" placeholder="请填写全市刑事案件发破案统计..."></textarea></div>
+
+          <div class="sub-title">（二）人员抓获 <span class="dept-tag" style="margin-left:8px">刑侦大队、治安大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待刑侦大队、治安大队填写..."></textarea></div>
+
+          <div class="sub-title">（三）盗抢骗发破案 <span class="dept-tag" style="margin-left:8px">刑侦大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待刑侦大队填写..."></textarea></div>
+
+          <div class="sub-title">（四）电诈犯罪 <span class="dept-tag" style="margin-left:8px">刑侦大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待刑侦大队填写..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- 五、基础管控 -->
+      <div class="card">
+        <div class="card-header"><h3>五、基础管控</h3></div>
+        <div class="card-body">
+          <div class="sub-title">（一）综合指挥室 <span class="dept-tag" style="margin-left:8px">情指中心报送</span></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>1. 处警问题数据 <span class="required">*</span></label>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>单位</th><th>今日自查</th><th>本周自查累计</th><th>本月自查累计</th><th>扬州通报累计</th><th>十类警情扬州通报累计</th></tr></thead>
+                <tbody>
+                  <tr><td>珠湖</td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td></tr>
+                  <tr><td>武安</td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td><td><input class="form-control" style="width:60px;height:28px;text-align:center"></td></tr>
+                  <tr><td style="font-weight:600">合计</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>2. 敏感警情反应速度 <span class="required">*</span></label>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>警情发生地</th><th>警情类别</th><th>单位</th><th>出警用时(分钟)</th><th>到场用时(分钟)</th><th>平均出警用时</th><th>平均到场用时</th></tr></thead>
+                <tbody>
+                  <tr><td>城区</td><td><input class="form-control" style="width:80px;height:28px"></td><td><input class="form-control" style="width:80px;height:28px"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td></tr>
+                  <tr><td>乡镇</td><td><input class="form-control" style="width:80px;height:28px"></td><td><input class="form-control" style="width:80px;height:28px"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td><td><input class="form-control" style="width:70px;height:28px;text-align:center"></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF">
+            <label>3. "大运合"平台赋能情况</label>
+            <textarea class="form-control" rows="2" placeholder='X月X日"大运合"平台完成赋能X次，县级赋能以上X起...'></textarea>
+          </div>
+
+          <div class="sub-title">（二）情报信息报送 <span class="dept-tag" style="margin-left:8px">情指中心、出入境、网安、刑侦</span></div>
+          <div class="form-group" style="background:#ecf5ff;padding:12px;border-radius:4px;border-left:3px solid #409EFF"><label>情指中心报送</label><textarea class="form-control" rows="2" placeholder="请填写情报信息报送内容..."></textarea></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><label>出入境管理大队报送</label><textarea class="form-control" rows="2" readonly></textarea></div>
+
+          <div class="sub-title">（三）治安风险防控 <span class="dept-tag" style="margin-left:8px">治安大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待治安大队填写..."></textarea></div>
+
+          <div class="sub-title">（四）巡防情况 <span class="dept-tag" style="margin-left:8px">巡特警大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待巡特警大队填写..."></textarea></div>
+
+          <div class="sub-title">（五）反诈工作 <span class="dept-tag" style="margin-left:8px">刑侦大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待刑侦大队填写..."></textarea></div>
+
+          <div class="sub-title">（六）监所管理 <span class="dept-tag" style="margin-left:8px">看守所</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待看守所填写..."></textarea></div>
+
+          <div class="sub-title">（七）出入境管理 <span class="dept-tag" style="margin-left:8px">出入境管理大队</span></div>
+          <div class="form-group" style="opacity:0.5;pointer-events:none"><textarea class="form-control" rows="2" readonly placeholder="等待出入境管理大队填写..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- 六、督审工作 -->
+      <div class="card">
+        <div class="card-header"><h3>六、督审工作</h3><span class="dept-tag">督审大队报送</span></div>
+        <div class="card-body" style="opacity:0.5;pointer-events:none">
+          <div class="sub-title">（一）队伍管理</div>
+          <div class="form-group"><label>12345平台工单</label><textarea class="form-control" rows="2" readonly placeholder="等待督审大队填写..."></textarea></div>
+          <div class="sub-title">（二）民意访评质态</div>
+          <div class="form-group"><textarea class="form-control" rows="2" readonly placeholder="等待督审大队填写..."></textarea></div>
+          <div class="sub-title">（三）信访积案化解</div>
+          <div class="form-group"><textarea class="form-control" rows="2" readonly placeholder="等待督审大队填写..."></textarea></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:20px">
+        <button class="btn" style="min-width:100px;margin-right:12px" onclick="switchTab('list')">取消</button>
+        <button class="btn btn-primary" style="min-width:100px;margin-right:12px">暂存草稿</button>
+        <button class="btn btn-success" style="min-width:100px">提交审核</button>
+      </div>
+    </div>
+
+    <!-- Tab: 日报预览 -->
+    <div id="tab-preview" class="tab-panel" style="background:#fff;padding:40px;max-width:900px;margin:0 auto;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+      <div class="secret-mark">内部▲长期</div>
+      <div class="print-header">
+        <h1>高邮公安工作日报</h1>
+        <div class="meta">高邮市公安局情报指挥中心&emsp;&emsp;&emsp;&emsp;&emsp;2026年6月17日</div>
+      </div>
+      <hr style="border:1px solid #c00;margin:10px 0 20px">
+
+      <div class="section-title">一、警务动态</div>
+      <p style="text-indent:2em;font-size:14px;line-height:1.8;margin:8px 0">（一）情指中心。今日指挥调度警力XX人次，处置各类警情XX起，其中...</p>
+      <p style="text-indent:2em;font-size:14px;line-height:1.8;color:#999">（二）刑侦大队。<em>待填写...</em></p>
+      <p style="text-indent:2em;font-size:14px;line-height:1.8;color:#999">（三）治安大队。<em>待填写...</em></p>
+
+      <div class="section-title">二、今日警情</div>
+      <p style="text-indent:2em;font-size:14px;line-height:1.8">6月17日8时至6月17日20时，全市共接警86起，派处警情72起，其中违法犯罪类警情15起，环比下降8%，同比下降12%。</p>
+      <p style="font-weight:600;margin:10px 0 6px">（一）有效警情全量统计</p>
+      <table style="font-size:12px">
+        <thead><tr><th rowspan="2">单位</th><th rowspan="2">总数</th><th colspan="3">刑事警情</th><th colspan="3">治安警情</th><th rowspan="2">纠纷</th><th rowspan="2">道路交通</th><th rowspan="2">紧急求助</th><th rowspan="2">其他</th></tr><tr><th>八类</th><th>盗窃</th><th>电诈</th><th>娼赌</th><th>殴打他人</th><th>盗窃电诈</th></tr></thead>
+        <tbody><tr><td>警务站</td><td>8</td><td>-</td><td>2</td><td>1</td><td>-</td><td>3</td><td>-</td><td>6</td><td>4</td><td>2</td><td>-</td></tr><tr><td>珠湖</td><td>5</td><td>-</td><td>1</td><td>2</td><td>-</td><td>1</td><td>-</td><td>3</td><td>2</td><td>1</td><td>-</td></tr><tr style="font-weight:600;background:#f0f9eb"><td>合计</td><td>72</td><td>2</td><td>8</td><td>12</td><td>1</td><td>15</td><td>3</td><td>20</td><td>18</td><td>8</td><td>5</td></tr></tbody>
+      </table>
+
+      <div class="section-title">三、社会稳定</div>
+      <div class="section-title">四、打击破案</div>
+      <div class="section-title">五、基础管控</div>
+      <div class="section-title">六、督审工作</div>
+
+      <hr style="margin:30px 0 16px;border-top:1px solid #ddd">
+      <p style="font-size:12px;color:#999;text-indent:2em;line-height:1.6">此件不得通过手机、互联网、微信、微博、QQ、网站等公共平台转发传播。</p>
+      <p style="font-size:13px;margin-top:10px">报：赵市长，各局领导。</p>
+      <p style="font-size:12px;color:#666;margin-top:20px;text-align:right">编辑：韦家辉&emsp;&emsp;核稿：徐锴&emsp;&emsp;签发：徐军</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tabs .tab').forEach((t,i)=>{
+    if(['list','fill','preview'][i]===id) t.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
